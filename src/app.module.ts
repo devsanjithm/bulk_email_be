@@ -5,6 +5,7 @@ import { AppService } from './app.service';
 import { JwtStrategy } from './helpers/jwt/jwt.stratergy';
 import { AppLoggerMiddleware } from './helpers/responseTime';
 import { UsersModule } from './users/users.module';
+import { SparkModule } from './spark/spark.module';
 
 @Module({
   imports: [
@@ -12,6 +13,7 @@ import { UsersModule } from './users/users.module';
     JwtModule.register({
       global: true,
     }),
+    SparkModule,
   ],
   controllers: [AppController],
   providers: [AppService, JwtStrategy],

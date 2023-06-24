@@ -1,5 +1,4 @@
 import { Injectable } from '@nestjs/common';
-import { Prisma } from '@prisma/client';
 import { PrismaService } from 'src/database/prisma.service';
 import { STATUS_CODE } from 'src/helpers/statusCode';
 import { CreateJobDTO } from './dto/create-user.dto';
