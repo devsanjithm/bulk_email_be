@@ -10,8 +10,7 @@ import {
   Res,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
-import { CreateUserDto } from './dto/create-user.dto';
-import { UpdateUserDto } from './dto/update-user.dto';
+import { CreateJobDTO, CreateUserDto } from './dto/create-user.dto';
 import response from 'src/helpers/response';
 import { STATUS_CODE } from 'src/helpers/statusCode';
 import { Response } from 'express';
@@ -23,7 +22,7 @@ export class UsersController {
 
   @Post()
   async create(
-    @Body() createUserDto: CreateUserDto,
+    @Body() createUserDto: CreateJobDTO,
     @Res() res: Response,
   ): Promise<Response> {
     try {

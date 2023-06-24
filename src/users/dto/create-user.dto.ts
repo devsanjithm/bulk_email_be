@@ -1,4 +1,11 @@
-import { IsEmail, IsNotEmpty, IsString } from 'class-validator';
+import { Type } from 'class-transformer';
+import {
+  IsEmail,
+  IsNotEmpty,
+  IsOptional,
+  IsString,
+  ValidateNested,
+} from 'class-validator';
 import { GetDto } from 'src/helpers/objectParser';
 export class CreateUserDto {
   @IsString()
@@ -14,8 +21,18 @@ export class CreateUserDto {
   public email_address: string;
 
   @IsString()
+  @IsOptional()
+  public location?: string;
+}
+
+export class CreateJobDTO {
+  @Type(() => CreateUserDto)
+  @ValidateNested()
+  public user_data: Array<CreateUserDto>;
+
+  @IsString()
   @IsNotEmpty()
-  public location: string;
+  public job_id: string;
 }
 
 export class updateUserDTO extends GetDto {}

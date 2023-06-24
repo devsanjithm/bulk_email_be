@@ -11,10 +11,23 @@ model users {
     id            String    @id @default(auto()) @map("_id") @db.ObjectId
     firstname     String
     lastname      String
-    email_adderss String    @unique
-    location      String
+    email_adderss String
+    location      String?
+    job_id        String    @db.ObjectId
+    job           job?      @relation(fields: [job_id], references: [id])
     status        Boolean   @default(true)
     created_at    DateTime  @default(now())
     updated_at    DateTime  @updatedAt
     deleted_at    DateTime?
+}
+
+model job {
+    id         String    @id @default(auto()) @map("_id") @db.ObjectId
+    jobid      String
+    job_status Boolean  @default(false)
+    status     Boolean   @default(true)
+    created_at DateTime  @default(now())
+    updated_at DateTime  @updatedAt
+    deleted_at DateTime?
+    users      users[]
 }
