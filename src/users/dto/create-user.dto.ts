@@ -26,6 +26,8 @@ export class CreateUserDto {
 }
 
 export class CreateJobDTO {
+
+  @IsNotEmpty()
   @Type(() => CreateUserDto)
   @ValidateNested()
   public user_data: Array<CreateUserDto>;

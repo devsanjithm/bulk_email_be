@@ -11,10 +11,10 @@ model users {
     id            String    @id @default(auto()) @map("_id") @db.ObjectId
     firstname     String
     lastname      String
-    email_adderss String
+    email_address String
     location      String?
-    job_id        String    @db.ObjectId
-    job           job?      @relation(fields: [job_id], references: [id])
+    job_id        String    @unique
+    job           job?      @relation(fields: [job_id], references: [jobid])
     status        Boolean   @default(true)
     created_at    DateTime  @default(now())
     updated_at    DateTime  @updatedAt
@@ -23,8 +23,8 @@ model users {
 
 model job {
     id         String    @id @default(auto()) @map("_id") @db.ObjectId
-    jobid      String
-    job_status Boolean  @default(false)
+    jobid      String    @unique
+    job_status Boolean   @default(false)
     status     Boolean   @default(true)
     created_at DateTime  @default(now())
     updated_at DateTime  @updatedAt

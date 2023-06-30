@@ -16,19 +16,19 @@ import { STATUS_CODE } from 'src/helpers/statusCode';
 import { Response } from 'express';
 import * as _ from 'lodash';
 
-@Controller('users')
+@Controller()
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
-  @Post()
+  @Post('users')
   async create(
     @Body() createUserDto: CreateJobDTO,
     @Res() res: Response,
   ): Promise<Response> {
     try {
-      debugger
-      console.log("sssssss");
-      
+      debugger;
+      console.log('sssssss');
+
       const user = await this.usersService.create(createUserDto);
       return res
         .status(STATUS_CODE.created)
@@ -61,6 +61,41 @@ export class UsersController {
     }
   }
 
+  @Post('send-mail')
+  async sendMail(@Body() body: { job_id: string }, @Res() res: Response) {
+    try {
+      const user = await this.usersService.SendBulkMail(body.job_id);
+      return res
+        .status(STATUS_CODE.success)
+        .json(
+          await response(
+            `Mail Sent Successfully`,
+            { user },
+            STATUS_CODE.created,
+            true,
+            '',
+          ),
+        );
+    } catch (error) {
+      Logger.error(error);
+      return res
+        .status(
+          _.has(error, 'code') ? error?.code : STATUS_CODE.internalServerError,
+        )
+        .json(
+          await response(
+            `Mail Failed to Send`,
+            {},
+            _.has(error, 'code')
+              ? error?.code
+              : STATUS_CODE.internalServerError,
+            false,
+            error.message,
+          ),
+        );
+    }
+  }
+
   @Get()
   findAll() {
     return this.usersService.findAll();
@@ -70,5 +105,4 @@ export class UsersController {
   findOne(@Param('id') id: string) {
     return this.usersService.findOne(+id);
   }
-
 }

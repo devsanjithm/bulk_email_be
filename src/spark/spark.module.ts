@@ -4,6 +4,7 @@ import { SparkController } from './spark.controller';
 
 @Module({
   controllers: [SparkController],
-  providers: [SparkService]
+  providers: [SparkService],
+  exports: [SparkService],
 })
 export class SparkModule {}
