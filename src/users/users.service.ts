@@ -7,6 +7,8 @@ import { CreateJobDTO } from './dto/create-user.dto';
 export class UsersService {
   constructor(private prismaClient: PrismaService) {}
   create(CreateUserDto: CreateJobDTO) {
+    console.log(CreateUserDto,"CreateUserDto");
+    
     return new Promise(async (resolve, reject) => {
       try {
         let jobs = await this.prismaClient.$transaction(async (tx) => {
@@ -39,6 +41,19 @@ export class UsersService {
     });
   }
 
+  // SendBulkMail(CreateUserDto: CreateJobDTO) {
+  //   return new Promise(async (resolve, reject) => {
+  //     try {
+  //     let getJob = await this.prismaClient.job.findFirst({where:{
+  //       jobid:CreateUserDto.job_id
+  //     }})
+
+  //       
+  //     } catch (error) {
+  //       return reject(error);
+  //     }
+  //   });
+  // }
   findAll() {
     return `This action returns all users`;
   }

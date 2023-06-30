@@ -26,6 +26,9 @@ export class UsersController {
     @Res() res: Response,
   ): Promise<Response> {
     try {
+      debugger
+      console.log("sssssss");
+      
       const user = await this.usersService.create(createUserDto);
       return res
         .status(STATUS_CODE.created)
