@@ -12,7 +12,7 @@ export class UsersService {
     private sparkClient: SparkService,
   ) {}
   create(CreateUserDto: CreateJobDTO) {
-    console.log(CreateUserDto, 'CreateUserDto');
+    // console.log(CreateUserDto, 'CreateUserDto');
 
     return new Promise(async (resolve, reject) => {
       try {
@@ -27,9 +27,14 @@ export class UsersService {
           });
           let userData = [];
           CreateUserDto.user_data.map((ele) => {
+            
+            
             ele['job_id'] = job.jobid;
             userData.push(ele);
           });
+
+          console.log(userData,'userData');
+          
           let users = await tx.users.createMany({
             data: userData,
           });
@@ -46,8 +51,13 @@ export class UsersService {
     });
   }
 
-  SendBulkMail(job_id: string) {
+  SendBulkMail(data: any) {
     return new Promise(async (resolve, reject) => {
+      console.log(data,"data");
+       let {job_id,mailContent} = data
+
+      //  console.log(data,"data");
+       
       try {
         let getUsers = await this.prismaClient.users.findMany({
           where: {
@@ -62,10 +72,15 @@ export class UsersService {
           });
         }
         let users = [];
-        getUsers.map((ele) => {
+        getUsers.map((ele:any) => {
           users.push({ address: ele.email_address });
         });
-        let sendMail = await this.sparkClient.sendBulkmail(users);
+
+        let MailData:any = {
+          users:users,
+          mailContent:mailContent
+        }
+        let sendMail = await this.sparkClient.sendBulkmail(MailData);
         return resolve({
           statusCode: STATUS_CODE.success,
           message: 'Mail Sent Successfully',
