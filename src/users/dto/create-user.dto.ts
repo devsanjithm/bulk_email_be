@@ -97,6 +97,10 @@ export class CreateJobDTO {
   @IsOptional()
   public mail_content: string;
 
+  @IsString()
+  @IsOptional()
+  public header_content: string;
+
 }
 
 export class updateUserDTO extends GetDto {}

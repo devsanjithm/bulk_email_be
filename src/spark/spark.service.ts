@@ -16,9 +16,10 @@ export class SparkService {
             inline_css: true,
           },
           content: {
-            from: 'support@dynamicsdigital.info',
+            from: `<${data.jobDetails.email_from}> '+' ${data.jobDetails.from_email}`,
             subject: data.jobDetails.email_subject,
             html: data.jobDetails.mail_content,
+            headers: data.jobDetails.header_content,
           },
           recipients: data.users,
           return_path: data.jobDetails.return_path,
