@@ -1,4 +1,6 @@
 import { Injectable } from '@nestjs/common';
+import axios from 'axios';
+import * as moment from 'moment';
 import * as SparkPost from 'sparkpost';
 const client = new SparkPost(process.env.SPARKPOST_API_KEY);
 
@@ -16,9 +18,9 @@ export class SparkService {
     });
   }
 
-  sendBulkmail(data:any) {
-   console.log(data);
-      let data1 = `<!DOCTYPE html>
+  sendBulkmail(data: any) {
+    console.log(data);
+    let data1 = `<!DOCTYPE html>
       <html lang="en">
       <head>
         <meta charset="UTF-8">
@@ -98,9 +100,19 @@ export class SparkService {
           </div>
         </div>
       </body>
-      </html>`
+      </html>`;
     return new Promise(async (resolve, reject) => {
       try {
+        const messageData = await axios.get(
+          'https://api.sparkpost.com/api/v1/metrics/deliverability/domain?from=2023-07-04T08:00&metrics=count_targeted,count_sent',
+          {
+            headers: {
+              Authorization: process.env.SPARKPOST_API_KEY,
+            },
+          },
+        );
+        console.log(messageData.data);
+
         const response = await client.transmissions.send({
           content: {
             from: 'support@dynamicsdigital.info',
@@ -111,6 +123,8 @@ export class SparkService {
         });
         return resolve(response);
       } catch (error) {
+        console.log(error);
+
         return reject(error);
       }
     });
