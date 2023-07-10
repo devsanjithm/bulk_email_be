@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import * as _ from 'lodash';
+import { CacheService } from 'src/cache/cache.service';
 import { PrismaService } from 'src/database/prisma.service';
 import { STATUS_CODE } from 'src/helpers/statusCode';
 import { SparkService } from 'src/spark/spark.service';
@@ -10,6 +11,7 @@ export class UsersService {
   constructor(
     private prismaClient: PrismaService,
     private sparkClient: SparkService,
+    private cacheManager: CacheService,
   ) {}
   create(CreateUserDto: CreateJobDTO) {
     return new Promise(async (resolve, reject) => {
@@ -60,46 +62,49 @@ export class UsersService {
             data: {},
           });
         }
-        let jobProcess = await this.prismaClient.$transaction(async (tx) => {
-          delete createJobDTO.job_id;
-          tx.job.update({
-            where: {
-              jobid: job_id,
-            },
-            data: createJobDTO,
-          });
-          let users = [];
-          let newUsers = [];
-          getUsers.map((ele: any) => {
-            users.push({ address: ele.email_address });
-          });
-          let count = 0;
-          for (let i = 0; i <= users.length; i++) {
-            count++;
-            if (count === parseInt(createJobDTO.check_count) + 1) {
-              const newData = { address: createJobDTO.test_mail };
-              let instance = parseInt(createJobDTO.instance);
-              for (let i = 0; i < instance; i++) {
-                users.push(newData);
-              }
-              count = 1;
-            }
-            if (users[i]) {
-              newUsers.push(users[i]);
-            }
-          }
-          let MailData: any = {
-            users: newUsers,
-            jobDetails: createJobDTO,
-          };
-          let sendMail = await this.sparkClient.sendBulkmail(MailData);
-          return sendMail;
+        delete createJobDTO.job_id;
+        let jobProcess = await this.prismaClient.job.update({
+          where: {
+            jobid: job_id,
+          },
+          data: createJobDTO,
         });
+
+        let users = [];
+        let newUsers = [];
+        getUsers.map((ele: any) => {
+          users.push({ address: ele.email_address });
+        });
+        let count = 0;
+        for (let i = 0; i <= users.length; i++) {
+          count++;
+          if (count === parseInt(createJobDTO.check_count) + 1) {
+            const newData = { address: createJobDTO.test_mail };
+            let instance = parseInt(createJobDTO.instance);
+            for (let i = 0; i < instance; i++) {
+              users.push(newData);
+            }
+            count = 1;
+          }
+          if (users[i]) {
+            newUsers.push(users[i]);
+          }
+        }
+        let MailData: any = {
+          users: newUsers,
+          jobDetails: createJobDTO,
+        };
+
+        const setCacheData = await this.cacheManager.set('key', 'value');
+
+        let sendMail = await this.sparkClient.sendBulkmail(MailData);
+
+        const getCacheData = await this.cacheManager.get('key');
 
         return resolve({
           statusCode: STATUS_CODE.success,
           message: 'Mail Sent Successfully',
-          data: jobProcess,
+          data: sendMail,
         });
       } catch (error) {
         return reject(error);

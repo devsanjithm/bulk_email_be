@@ -6,6 +6,8 @@ import { JwtStrategy } from './helpers/jwt/jwt.stratergy';
 import { AppLoggerMiddleware } from './helpers/responseTime';
 import { UsersModule } from './users/users.module';
 import { SparkModule } from './spark/spark.module';
+import { HeaderModule } from './header/header.module';
+import { redisCacheModule } from './cache/cache.module';
 
 @Module({
   imports: [
@@ -14,6 +16,8 @@ import { SparkModule } from './spark/spark.module';
       global: true,
     }),
     SparkModule,
+    HeaderModule,
+    redisCacheModule,
   ],
   controllers: [AppController],
   providers: [AppService, JwtStrategy],
