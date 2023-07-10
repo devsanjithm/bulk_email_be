@@ -69,29 +69,32 @@ export class UsersService {
           },
           data: createJobDTO,
         });
-
         let users = [];
-        let newUsers = [];
         getUsers.map((ele: any) => {
           users.push({ address: ele.email_address });
         });
-        let count = 0;
-        for (let i = 0; i <= users.length; i++) {
-          count++;
-          if (count === parseInt(createJobDTO.check_count) + 1) {
-            const newData = { address: createJobDTO.test_mail };
-            let instance = parseInt(createJobDTO.instance);
-            for (let i = 0; i < instance; i++) {
-              users.push(newData);
-            }
-            count = 1;
-          }
-          if (users[i]) {
-            newUsers.push(users[i]);
-          }
-        }
+
+        // let newUsers = [];
+        // getUsers.map((ele: any) => {
+        //   users.push({ address: ele.email_address });
+        // });
+        // let count = 0;
+        // for (let i = 0; i <= users.length; i++) {
+        //   count++;
+        //   if (count === parseInt(createJobDTO.check_count) + 1) {
+        //     const newData = { address: createJobDTO.test_mail };
+        //     let instance = parseInt(createJobDTO.instance);
+        //     for (let i = 0; i < instance; i++) {
+        //       users.push(newData);
+        //     }
+        //     count = 1;
+        //   }
+        //   if (users[i]) {
+        //     newUsers.push(users[i]);
+        //   }
+        // }
         let MailData: any = {
-          users: newUsers,
+          users: users,
           jobDetails: createJobDTO,
         };
 
