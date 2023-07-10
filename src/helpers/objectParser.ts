@@ -12,7 +12,7 @@ export class prismaFilterOptions {
   take: number;
   skip: number;
   where?: object;
-  include?: object;
+  include?:  never;
   select?: object;
   orderBy?: object;
 }
@@ -39,9 +39,9 @@ const listParser = ({
   if (Object.keys(select).length !== 0) {
     finalData.select = select;
   }
-  if (Object.keys(include).length !== 0) {
-    finalData[`include`] = include;
-  }
+  // if (Object.keys(include).length !== 0) {
+  //   finalData[`include`] = include;
+  // }
   return finalData;
 };
 export default listParser;

@@ -46,3 +46,13 @@ model job {
     deleted_at    DateTime?
     users         users[]
 }
+
+model header {
+    id         String    @id @default(auto()) @map("_id") @db.ObjectId
+    name       String    @unique
+    meta_data  String
+    status     Boolean   @default(true)
+    created_at DateTime  @default(now())
+    updated_at DateTime  @updatedAt
+    deleted_at DateTime?
+}
