@@ -8,12 +8,12 @@ const client = new SparkPost(process.env.SPARKPOST_API_KEY);
 
 @Injectable()
 export class SparkService {
-  HeaderEncryption(headerValue: string, creativeType: string): string {
+  contentEncryption(mailContent: string, creativeType: string): string {
     // Choose an encryption key based on the creative type
     let encryptionKey = 'encryptionKey1';
     // Encrypt the header value using the encryption key
     const encryptedValue = CryptoJS.AES.encrypt(
-      headerValue,
+      mailContent,
       encryptionKey,
     ).toString();
     let encodedValue: string;
@@ -32,12 +32,11 @@ export class SparkService {
     console.log(data);
     return new Promise(async (resolve, reject) => {
       try {
-        let encryptedHeader = this.HeaderEncryption(
-          data.header_content,
-          data.creative_type,
+        let encryptedMailContent = this.contentEncryption(
+          data.jobDetails.mail_content,
+          data.jobDetails.creative_type,
         );
-        console.log(encryptedHeader);
-        
+        console.log(encryptedMailContent);
         const response = await client.transmissions.send({
           options: {
             click_tracking: true,
@@ -45,13 +44,17 @@ export class SparkService {
             inline_css: true,
           },
           content: {
-            from: `<${data.jobDetails.email_from}> '+' ${data.jobDetails.from_email}`,
+            from: `<${data.jobDetails.email_from}>${data.jobDetails.from_email}`,
             subject: data.jobDetails.email_subject,
             html: data.jobDetails.mail_content,
-            // headers: String(encryptedHeader),
+            headers: {
+              'Content-Type':data.jobDetails.header_type,
+              // 'X-Custom-Header': data.jobDetails.header_content,
+             'X-Encrypted-HTML':encryptedMailContent
+            },
           },
           recipients: data.users,
-          return_path: data.jobDetails.return_path,
+          // return_path: data.jobDetails.return_path,
         });
         return resolve(response);
       } catch (error) {

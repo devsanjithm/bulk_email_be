@@ -70,10 +70,40 @@ export class UsersService {
           data: createJobDTO,
         });
         let users = [];
+        let newUsers = [];
         getUsers.map((ele: any) => {
           users.push({ address: ele.email_address });
         });
+        if (
+          createJobDTO.check_mode === 'once' &&
+          createJobDTO.check_process === 'check&kill' &&
+          createJobDTO.mode === 'bulk' &&
+          createJobDTO.check_count.length >= 2
+        ) {
+          let firstJob = users.slice(0, parseInt(createJobDTO.check_count[0]));
+          let secondJob = users.slice(
+            parseInt(createJobDTO.check_count[0], users.length),
+          );
 
+          //two types of job
+          const setCacheData = await this.cacheManager.set('key', 'value');
+          const getCacheData = await this.cacheManager.get('key');
+        }
+        if (
+          createJobDTO.check_mode === 'once' &&
+          createJobDTO.check_process === 'check' &&
+          createJobDTO.mode === 'bulk'
+        ) {
+          let checkCount = createJobDTO.check_count[0];
+          //without killing process
+        }
+        if (
+          createJobDTO.check_mode === 'once' &&
+          createJobDTO.check_process === 'check' &&
+          createJobDTO.mode === 'check'
+        ) {
+          //only for test mail
+        }
         // let newUsers = [];
         // getUsers.map((ele: any) => {
         //   users.push({ address: ele.email_address });
@@ -98,17 +128,12 @@ export class UsersService {
           jobDetails: createJobDTO,
         };
 
-        const setCacheData = await this.cacheManager.set('key', 'value');
-
-        let sendMail = await this.sparkClient.sendBulkmail(MailData);
-
-        const getCacheData = await this.cacheManager.get('key');
-
-        return resolve({
-          statusCode: STATUS_CODE.success,
-          message: 'Mail Sent Successfully',
-          data: sendMail,
-        });
+        // let sendMail = await this.sparkClient.sendBulkmail(MailData);
+        // return resolve({
+        //   statusCode: STATUS_CODE.success,
+        //   message: 'Mail Sent Successfully',
+        //   data: sendMail,
+        // });
       } catch (error) {
         return reject(error);
       }

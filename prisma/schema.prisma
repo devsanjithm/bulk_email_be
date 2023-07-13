@@ -36,7 +36,7 @@ model job {
     check_process  String?
     mode           String?
     process        String?
-    check_count    String?
+    check_count    String[]
     instance       String?
     mail_content   String?
     header_content String?
