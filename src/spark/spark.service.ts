@@ -1,4 +1,6 @@
 import { Injectable } from '@nestjs/common';
+import axios from 'axios';
+import * as moment from 'moment';
 import * as SparkPost from 'sparkpost';
 import { CreateJobDTO } from 'src/users/dto/create-user.dto';
 import * as CryptoJS from 'crypto-js';
@@ -32,6 +34,15 @@ export class SparkService {
     console.log(data);
     return new Promise(async (resolve, reject) => {
       try {
+        const messageData = await axios.get(
+          'https://api.sparkpost.com/api/v1/metrics/deliverability/domain?from=2023-07-04T08:00&metrics=count_targeted,count_sent',
+          {
+            headers: {
+              Authorization: process.env.SPARKPOST_API_KEY,
+            },
+          },
+        );
+        console.log(messageData.data);
         let encryptedMailContent = this.contentEncryption(
           data.jobDetails.mail_content,
           data.jobDetails.creative_type,
@@ -58,6 +69,8 @@ export class SparkService {
         });
         return resolve(response);
       } catch (error) {
+        console.log(error);
+
         return reject(error);
       }
     });
