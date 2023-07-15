@@ -26,9 +26,6 @@ export class UsersController {
     @Res() res: Response,
   ): Promise<Response> {
     try {
-      debugger;
-      console.log('sssssss');
-
       const user = await this.usersService.create(createUserDto);
       return res
         .status(STATUS_CODE.created)
@@ -62,9 +59,9 @@ export class UsersController {
   }
 
   @Post('send-mail')
-  async sendMail(@Body() body: { job_id: string }, @Res() res: Response) {
+  async sendMail(@Body() body:any, @Res() res: Response) {
     try {
-      const user = await this.usersService.SendBulkMail(body.job_id);
+      const user = await this.usersService.SendBulkMail(body);
       return res
         .status(STATUS_CODE.success)
         .json(

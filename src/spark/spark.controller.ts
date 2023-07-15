@@ -9,42 +9,4 @@ import * as _ from 'lodash';
 @Controller('spark')
 export class SparkController {
   constructor(private readonly sparkService: SparkService) {}
-
-  @Post()
-  async SendMail(
-    @Body() createUserDto: any,
-    @Res() res: Response,
-  ): Promise<Response> {
-    try {
-      const user = await this.sparkService.sendMail(createUserDto);
-      return res
-        .status(STATUS_CODE.created)
-        .json(
-          await response(
-            `Job completed successfully`,
-            { user },
-            STATUS_CODE.created,
-            true,
-            '',
-          ),
-        );
-    } catch (error) {    
-      Logger.error(error);
-      return res
-        .status(
-          _.has(error, 'code') ? error?.code : STATUS_CODE.internalServerError,
-        )
-        .json(
-          await response(
-            `Job Failed`,
-            {},
-            _.has(error, 'code')
-              ? error?.code
-              : STATUS_CODE.internalServerError,
-            false,
-            error.message,
-          ),
-        );
-    }
-  }
 }

@@ -22,12 +22,38 @@ model users {
 }
 
 model job {
+    id             String    @id @default(auto()) @map("_id") @db.ObjectId
+    jobid          String    @unique
+    email_subject  String?
+    email_from     String?
+    from_email     String?
+    url_domain     String?
+    return_path    String?
+    test_mail      String?
+    header_type    String?
+    check_mode     String?
+    creative_type  String?
+    check_process  String?
+    mode           String?
+    process        String?
+    check_count    String[]
+    instance       String?
+    mail_content   String?
+    header_content String?
+    job_status     Boolean   @default(false)
+    status         Boolean   @default(true)
+    created_at     DateTime  @default(now())
+    updated_at     DateTime  @updatedAt
+    deleted_at     DateTime?
+    users          users[]
+}
+
+model header {
     id         String    @id @default(auto()) @map("_id") @db.ObjectId
-    jobid      String    @unique
-    job_status Boolean   @default(false)
+    name       String    @unique
+    meta_data  String
     status     Boolean   @default(true)
     created_at DateTime  @default(now())
     updated_at DateTime  @updatedAt
     deleted_at DateTime?
-    users      users[]
 }
