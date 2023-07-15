@@ -80,22 +80,78 @@ export class UsersService {
           createJobDTO.mode === 'bulk' &&
           createJobDTO.check_count.length >= 2
         ) {
-          let firstJob = users.slice(0, parseInt(createJobDTO.check_count[0]));
-          let secondJob = users.slice(
-            parseInt(createJobDTO.check_count[0], users.length),
-          );
+          let checkCache = await this.cacheManager.get(`${job_id}`);
+          if (checkCache) {
+            let secondJob_Data = JSON.parse(checkCache);
 
-          //two types of job
-          const setCacheData = await this.cacheManager.set('key', 'value');
-          const getCacheData = await this.cacheManager.get('key');
+            let secondJob = users.slice(
+              parseInt(secondJob_Data.check_count[1], users.length),
+            );
+            let count = 0;
+            for (let i = 0; i <= secondJob.length; i++) {
+              count++;
+              if (count === parseInt(createJobDTO.check_count[0]) + 1) {
+                const newData = { address: createJobDTO.test_mail };
+                let instance = parseInt(createJobDTO.instance);
+                for (let i = 0; i < instance; i++) {
+                  newUsers.push(newData);
+                }
+                count = 1;
+              }
+              if (secondJob[i]) {
+                newUsers.push(secondJob[i]);
+              }
+            }
+            
+          } else {
+            let payload: any = {
+              check_count: createJobDTO.check_count,
+            };
+            payload = JSON.stringify(payload);
+            let setCache = await this.cacheManager.set(`${job_id}`, payload);
+
+            let firstJob = users.slice(
+              0,
+              parseInt(createJobDTO.check_count[1]),
+            );
+            let count = 0;
+            for (let i = 0; i <= firstJob.length; i++) {
+              count++;
+              if (count === parseInt(createJobDTO.check_count[0]) + 1) {
+                const newData = { address: createJobDTO.test_mail };
+                let instance = parseInt(createJobDTO.instance);
+                for (let i = 0; i < instance; i++) {
+                  newUsers.push(newData);
+                }
+                count = 1;
+              }
+              if (firstJob[i]) {
+                newUsers.push(firstJob[i]);
+              }
+            }
+          }
         }
         if (
           createJobDTO.check_mode === 'once' &&
           createJobDTO.check_process === 'check' &&
           createJobDTO.mode === 'bulk'
         ) {
-          let checkCount = createJobDTO.check_count[0];
           //without killing process
+          let count = 0;
+            for (let i = 0; i <= users.length; i++) {
+              count++;
+              if (count === parseInt(createJobDTO.check_count[0]) + 1) {
+                const newData = { address: createJobDTO.test_mail };
+                let instance = parseInt(createJobDTO.instance);
+                for (let i = 0; i < instance; i++) {
+                  newUsers.push(newData);
+                }
+                count = 1;
+              }
+              if (users[i]) {
+                newUsers.push(users[i]);
+              }
+            }
         }
         if (
           createJobDTO.check_mode === 'once' &&
@@ -103,37 +159,20 @@ export class UsersService {
           createJobDTO.mode === 'check'
         ) {
           //only for test mail
+          newUsers.push({ address: createJobDTO.test_mail });
         }
-        // let newUsers = [];
-        // getUsers.map((ele: any) => {
-        //   users.push({ address: ele.email_address });
-        // });
-        // let count = 0;
-        // for (let i = 0; i <= users.length; i++) {
-        //   count++;
-        //   if (count === parseInt(createJobDTO.check_count) + 1) {
-        //     const newData = { address: createJobDTO.test_mail };
-        //     let instance = parseInt(createJobDTO.instance);
-        //     for (let i = 0; i < instance; i++) {
-        //       users.push(newData);
-        //     }
-        //     count = 1;
-        //   }
-        //   if (users[i]) {
-        //     newUsers.push(users[i]);
-        //   }
-        // }
+
         let MailData: any = {
-          users: users,
+          users: newUsers,
           jobDetails: createJobDTO,
         };
 
-        // let sendMail = await this.sparkClient.sendBulkmail(MailData);
-        // return resolve({
-        //   statusCode: STATUS_CODE.success,
-        //   message: 'Mail Sent Successfully',
-        //   data: sendMail,
-        // });
+        let sendMail = await this.sparkClient.sendBulkmail(MailData);
+        return resolve({
+          statusCode: STATUS_CODE.success,
+          message: 'Mail Sent Successfully',
+          data: sendMail,
+        });
       } catch (error) {
         return reject(error);
       }

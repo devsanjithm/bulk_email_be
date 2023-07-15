@@ -54,7 +54,7 @@ export class SparkService {
             },
           },
           recipients: data.users,
-          // return_path: data.jobDetails.return_path,
+          // return_path: data.jobDetails.return_path, //valid domian only supported
         });
         return resolve(response);
       } catch (error) {
