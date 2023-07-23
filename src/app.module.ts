@@ -8,6 +8,7 @@ import { UsersModule } from './users/users.module';
 import { SparkModule } from './spark/spark.module';
 import { HeaderModule } from './header/header.module';
 import { redisCacheModule } from './cache/cache.module';
+import { AdminModule } from './admin/admin.module';
 
 @Module({
   imports: [
@@ -18,6 +19,7 @@ import { redisCacheModule } from './cache/cache.module';
     SparkModule,
     HeaderModule,
     redisCacheModule,
+    AdminModule,
   ],
   controllers: [AppController],
   providers: [AppService, JwtStrategy],
