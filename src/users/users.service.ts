@@ -5,7 +5,7 @@ import { PrismaService } from 'src/database/prisma.service';
 import { STATUS_CODE } from 'src/helpers/statusCode';
 import { SparkService } from 'src/spark/spark.service';
 import { CreateJobDTO } from './dto/create-user.dto';
-
+import {worker} from 'src/WorkerThreads/worker';
 @Injectable()
 export class UsersService {
   constructor(
@@ -102,7 +102,6 @@ export class UsersService {
                 newUsers.push(secondJob[i]);
               }
             }
-            
           } else {
             let payload: any = {
               check_count: createJobDTO.check_count,
@@ -138,20 +137,20 @@ export class UsersService {
         ) {
           //without killing process
           let count = 0;
-            for (let i = 0; i <= users.length; i++) {
-              count++;
-              if (count === parseInt(createJobDTO.check_count[0]) + 1) {
-                const newData = { address: createJobDTO.test_mail };
-                let instance = parseInt(createJobDTO.instance);
-                for (let i = 0; i < instance; i++) {
-                  newUsers.push(newData);
-                }
-                count = 1;
+          for (let i = 0; i <= users.length; i++) {
+            count++;
+            if (count === parseInt(createJobDTO.check_count[0]) + 1) {
+              const newData = { address: createJobDTO.test_mail };
+              let instance = parseInt(createJobDTO.instance);
+              for (let i = 0; i < instance; i++) {
+                newUsers.push(newData);
               }
-              if (users[i]) {
-                newUsers.push(users[i]);
-              }
+              count = 1;
             }
+            if (users[i]) {
+              newUsers.push(users[i]);
+            }
+          }
         }
         if (
           createJobDTO.check_mode === 'once' &&
@@ -166,6 +165,16 @@ export class UsersService {
           users: newUsers,
           jobDetails: createJobDTO,
         };
+
+        // send multithread message use worker
+        let workerData = {
+          MailData,
+          job_id,
+        };
+        let result = await (await worker)({
+          name:"sendBatchMail",
+          params:[workerData]
+        })
 
         let sendMail = await this.sparkClient.sendBulkmail(MailData);
         return resolve({
