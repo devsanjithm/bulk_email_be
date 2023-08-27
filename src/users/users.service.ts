@@ -1,18 +1,20 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import * as _ from 'lodash';
 import { CacheService } from 'src/cache/cache.service';
 import { PrismaService } from 'src/database/prisma.service';
 import { STATUS_CODE } from 'src/helpers/statusCode';
 import { SparkService } from 'src/spark/spark.service';
 import { CreateJobDTO } from './dto/create-user.dto';
-import {worker} from 'src/WorkerThreads/worker';
+import { WorkerPool } from 'src/workerPool';
 @Injectable()
 export class UsersService {
   constructor(
     private prismaClient: PrismaService,
     private sparkClient: SparkService,
     private cacheManager: CacheService,
-  ) {}
+    // private workerPool: WorkerPool,
+  ) {
+  }
   create(CreateUserDto: CreateJobDTO) {
     return new Promise(async (resolve, reject) => {
       try {
@@ -167,32 +169,30 @@ export class UsersService {
         };
 
         // send multithread message use worker
-        let workerData = {
-          MailData,
-          job_id,
-        };
-        let result = await (await worker)({
-          name:"sendBatchMail",
-          params:[workerData]
-        })
+        // let workerData = {
+        //   MailData,
+        //   job_id,
+        // };
+        // const wholeThreads = [];
+        // console.log('klkl======================');
 
-        let sendMail = await this.sparkClient.sendBulkmail(MailData);
+        // for (let i = 0; i < 2; i++) {
+        //   console.log(workerData);
+
+        //   const res = await this.workerPool.sendBatchMail(workerData);
+        //   wholeThreads.push(res);
+        // }
+        // console.log(wholeThreads);
+
+        // let sendMail = await this.sparkClient.sendBulkmail(MailData);
         return resolve({
           statusCode: STATUS_CODE.success,
           message: 'Mail Sent Successfully',
-          data: sendMail,
+          data: 'sendMail',
         });
       } catch (error) {
         return reject(error);
       }
     });
-  }
-
-  findAll() {
-    return `This action returns all users`;
-  }
-
-  findOne(id: number) {
-    return `This action returns a #${id} user`;
   }
 }

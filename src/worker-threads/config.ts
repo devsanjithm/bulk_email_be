@@ -1,0 +1,1 @@
+export { default as fib } from './sendBatchMail';
