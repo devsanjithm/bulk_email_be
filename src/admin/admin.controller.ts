@@ -1,34 +1,55 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import {
+  Controller,
+  Post,
+  Body,
+  Logger,
+  Res,
+} from '@nestjs/common';
 import { AdminService } from './admin.service';
-import { CreateAdminDto } from './dto/create-admin.dto';
-import { UpdateAdminDto } from './dto/update-admin.dto';
+import response from 'src/helpers/response';
+import { STATUS_CODE } from 'src/helpers/statusCode';
+import { Response } from 'express';
+import * as _ from 'lodash';
 
 @Controller('admin')
 export class AdminController {
   constructor(private readonly adminService: AdminService) {}
 
-  @Post()
-  create(@Body() createAdminDto: CreateAdminDto) {
-    return this.adminService.create(createAdminDto);
-  }
-
-  @Get()
-  findAll() {
-    return this.adminService.findAll();
-  }
-
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.adminService.findOne(+id);
-  }
-
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateAdminDto: UpdateAdminDto) {
-    return this.adminService.update(+id, updateAdminDto);
-  }
-
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.adminService.remove(+id);
+  @Post('login')
+  async create(
+    @Body() createUserDto: any,
+    @Res() res: Response,
+  ): Promise<Response> {
+    try {
+      const user = await this.adminService.login(createUserDto);
+      return res
+        .status(STATUS_CODE.created)
+        .json(
+          await response(
+            `User logged in Successfully`,
+            { user },
+            STATUS_CODE.success,
+            true,
+            '',
+          ),
+        );
+    } catch (error) {
+      Logger.error(error);
+      return res
+        .status(
+          _.has(error, 'code') ? error?.code : STATUS_CODE.internalServerError,
+        )
+        .json(
+          await response(
+            `Login Failed`,
+            {},
+            _.has(error, 'code')
+              ? error?.code
+              : STATUS_CODE.internalServerError,
+            false,
+            error.message,
+          ),
+        );
+    }
   }
 }

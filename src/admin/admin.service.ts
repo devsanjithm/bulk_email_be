@@ -1,26 +1,53 @@
 import { Injectable } from '@nestjs/common';
-import { CreateAdminDto } from './dto/create-admin.dto';
-import { UpdateAdminDto } from './dto/update-admin.dto';
-
+import _ from 'lodash';
+import { STATUS_CODE } from 'src/helpers/statusCode';
+import { PrismaService } from 'src/database/prisma.service';
+import * as bcrypt from 'bcrypt';
+import { JwtService } from '@nestjs/jwt';
 @Injectable()
 export class AdminService {
-  create(createAdminDto: CreateAdminDto) {
-    return 'This action adds a new admin';
-  }
+  constructor(
+    private prismaClient: PrismaService,
+    private jwtService: JwtService,
+  ) {}
+  login(payload: any) {
+    return new Promise(async (resolve, reject) => {
+      debugger
+      try {
+        let prevUser = await this.prismaClient.admin.findFirst({
+          where: {
+            email_address: payload.email_address,
+          },
+        });
 
-  findAll() {
-    return `This action returns all admin`;
-  }
+        if (_.isEmpty(prevUser)) {
+          return reject({
+            message: "User Doesn't Exists!",
+            code: STATUS_CODE.badRequest,
+          });
+        }
 
-  findOne(id: number) {
-    return `This action returns a #${id} admin`;
-  }
+        const checkPassword = bcrypt.compare(
+          payload.password,
+          prevUser.password,
+        );
 
-  update(id: number, updateAdminDto: UpdateAdminDto) {
-    return `This action updates a #${id} admin`;
-  }
+        if (!checkPassword) {
+          return reject({
+            message: 'Wrong Password!',
+            code: STATUS_CODE.badRequest,
+          });
+        }
 
-  remove(id: number) {
-    return `This action removes a #${id} admin`;
+        prevUser['password'] = null;
+
+        return resolve({
+          user: prevUser,
+          token: this.jwtService.sign(prevUser),
+        });
+      } catch (error) {
+        return reject(error);
+      }
+    });
   }
 }
