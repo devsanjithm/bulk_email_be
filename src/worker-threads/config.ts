@@ -1,1 +1,4 @@
-export { default as fib } from './sendBatchMail';
+
+const workerThreadFilePath = __dirname + '/sendBatchMail.js';
+
+export default workerThreadFilePath;

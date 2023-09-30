@@ -5,15 +5,19 @@ import { PrismaService } from 'src/database/prisma.service';
 import { STATUS_CODE } from 'src/helpers/statusCode';
 import { SparkService } from 'src/spark/spark.service';
 import { CreateJobDTO } from './dto/create-user.dto';
-import { WorkerPool } from 'src/workerPool';
+import { Worker, isMainThread } from 'worker_threads';
+
+import workerThreadFilePath from '../worker-threads/config';
+
 @Injectable()
 export class UsersService {
+  worker: Worker;
   constructor(
     private prismaClient: PrismaService,
     private sparkClient: SparkService,
-    private cacheManager: CacheService,
-    // private workerPool: WorkerPool,
+    private cacheManager: CacheService, // private workerPool: WorkerPool,
   ) {
+    this.worker = null;
   }
   create(CreateUserDto: CreateJobDTO) {
     return new Promise(async (resolve, reject) => {
@@ -57,6 +61,8 @@ export class UsersService {
             job_id,
           },
         });
+        console.log(getUsers);
+        
         if (_.isEmpty(getUsers)) {
           return reject({
             statusCode: STATUS_CODE.notFound,
@@ -168,21 +174,28 @@ export class UsersService {
           jobDetails: createJobDTO,
         };
 
-        // send multithread message use worker
-        // let workerData = {
-        //   MailData,
-        //   job_id,
-        // };
-        // const wholeThreads = [];
-        // console.log('klkl======================');
+        console.log('Mail Data  ===  ', MailData);        
 
-        // for (let i = 0; i < 2; i++) {
-        //   console.log(workerData);
+        try {
+          this.worker = new Worker(workerThreadFilePath, {
+            workerData: MailData,
+          });
 
-        //   const res = await this.workerPool.sendBatchMail(workerData);
-        //   wholeThreads.push(res);
-        // }
-        // console.log(wholeThreads);
+          this.worker.once('message', (result) => {
+            console.log(`$Email Sent Successfully : ${JSON.stringify(result)}`);
+          });
+
+          this.worker.on('error', (error) => {
+            console.log(error);
+          });
+
+          this.worker.on('exit', (exitCode) => {
+            console.log(`It exited with code ${exitCode}`);
+          });
+        } catch (error) {
+          console.error(error);
+          reject({ error: 'An error occurred' });
+        }
 
         // let sendMail = await this.sparkClient.sendBulkmail(MailData);
         return resolve({
@@ -194,5 +207,77 @@ export class UsersService {
         return reject(error);
       }
     });
+  }
+
+  /**
+   * Try to do a function with given code
+   */
+  // sendMail() {
+  //   return new Promise(async (resolve, reject) => {
+  //     try {
+  //       // Find unsent emails in batches
+  //       const batchSize = 100; // Adjust batch size as needed
+  //       let offset = 0;
+
+  //       while (true) {
+  //         const emails = await Email.find({ sent: false })
+  //           .limit(batchSize)
+  //           .skip(offset);
+
+  //         if (emails.length === 0) {
+  //           break; // No more unsent emails
+  //         }
+
+  //         // Send emails in the current batch
+  //         for (const email of emails) {
+  //           // Implement your email sending logic here (e.g., using Nodemailer)
+  //           // Set email.sent to true after successful sending
+  //           email.sent = true;
+  //           await email.save();
+  //         }
+
+  //         offset += batchSize;
+  //       }
+
+  //       resolve({ message: 'Email sending completed' });
+  //     } catch (error) {
+  //       console.error(error);
+  //       reject({ error: 'An error occurred' });
+  //     }
+  //   });
+  // }
+
+  // stopEmail() {
+  //   return new Promise(async (resolve, reject) => {
+  //     // Set the stopSending flag to true
+  //     stopSending = true;
+  //     resolve({ message: 'Email sending stopped' });
+
+  //     // Inside the sending loop
+  //     for (const email of emails) {
+  //       // Check if the stopSending flag is set
+  //       if (stopSending) {
+  //         // Stop the sending process gracefully
+  //         break;
+  //       }
+
+  //       // Implement your email sending logic here (e.g., using Nodemailer)
+  //       // Set email.sent to true after successful sending
+  //       email.sent = true;
+  //       await email.save();
+  //     }
+  //   });
+  // }
+
+  checkMainThread() {
+    Logger.log(
+      'Are we on the Main Thread here ?',
+      isMainThread ? 'Yes.' : 'No.',
+    );
+  }
+
+  stopLoop() {
+    this.worker.postMessage(true);
+    return { message: 'Loop Stopped' };
   }
 }
