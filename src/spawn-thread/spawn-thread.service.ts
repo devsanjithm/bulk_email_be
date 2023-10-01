@@ -7,7 +7,7 @@ export class SpawnThreadService {
     this.stopProcess = false;
   }
 
-  splitArrayByLimitAndSkip(array, limit, skip) {
+  splitArrayByLimitAndSkip(array, limit:number, skip:number) {
     if (!Array.isArray(array) || array.length === 0) {
       return [];
     }
@@ -26,7 +26,7 @@ export class SpawnThreadService {
 
     while (startIndex < array.length) {
       const chunk = array.slice(startIndex, startIndex + limit);
-      result.push(chunk);
+      result.push(chunk[0]);
       startIndex += limit + skip;
     }
 
@@ -34,31 +34,37 @@ export class SpawnThreadService {
   }
 
   runService = async (MainThreadData: any) => {
+    console.log("--");
+    
     return new Promise(async (resolve, reject) => {
       this.stopProcess = true;
 
-      const batchSize = 40; // Adjust batch size as needed
+      const batchSize = 1; // Adjust batch size as needed
       let offset = 0;
 
-      while (true) {
+      while (true) {        
         if (!this.stopProcess) {
           resolve({ message: 'Email Stopped Successfully', status: true });
           break;
         }
         let emails = this.splitArrayByLimitAndSkip(
-          MainThreadData,
-          offset,
+          MainThreadData.users,
           batchSize,
+          offset,
         );
 
-        if (emails.length === 0) {
+        console.log(MainThreadData);
+
+        if (emails.length === 0) {          
           resolve({ message: 'Email Sent Successfully', status: false });
           break; // No more unsent emails
         }
 
+        console.log("emaisl ===========0",emails);
+        
         // Send emails in the current batch
         try {
-          let sendMail = await this.sparkClient.sendBulkmail(emails);
+          let sendMail = await this.sparkClient.sendBulkmail({jobDetails:MainThreadData.jobDetails,users:emails});
           console.log(sendMail);
         } catch (error) {
           reject(error);
