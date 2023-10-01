@@ -9,6 +9,8 @@ import { SparkModule } from './spark/spark.module';
 import { HeaderModule } from './header/header.module';
 import { redisCacheModule } from './cache/cache.module';
 import { AdminModule } from './admin/admin.module';
+import { BullModule } from '@nestjs/bull';
+import { SpawnThreadModule } from './spawn-thread/spawn-thread.module';
 
 @Module({
   imports: [
@@ -20,6 +22,13 @@ import { AdminModule } from './admin/admin.module';
     HeaderModule,
     redisCacheModule,
     AdminModule,
+    BullModule.forRoot({
+      redis: {
+        host: 'localhost',
+        port: 6379,
+      },
+    }),
+    SpawnThreadModule,
   ],
   controllers: [AppController],
   providers: [AppService, JwtStrategy],

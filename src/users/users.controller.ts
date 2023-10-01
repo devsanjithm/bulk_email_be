@@ -59,7 +59,7 @@ export class UsersController {
   }
 
   @Post('send-mail')
-  async sendMail(@Body() body:any, @Res() res: Response) {
+  async sendMail(@Body() body: any, @Res() res: Response) {
     try {
       const user = await this.usersService.SendBulkMail(body);
       return res
@@ -92,5 +92,4 @@ export class UsersController {
         );
     }
   }
-
 }
