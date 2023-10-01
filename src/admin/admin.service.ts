@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import _ from 'lodash';
+import * as _ from 'lodash';
 import { STATUS_CODE } from 'src/helpers/statusCode';
 import { PrismaService } from 'src/database/prisma.service';
 import * as bcrypt from 'bcrypt';
@@ -40,12 +40,13 @@ export class AdminService {
         }
 
         prevUser['password'] = null;
-
+        
         return resolve({
           user: prevUser,
           token: this.jwtService.sign(prevUser),
         });
       } catch (error) {
+        console.log(error)
         return reject(error);
       }
     });
