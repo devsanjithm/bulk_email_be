@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { SparkService } from 'src/spark/spark.service';
+import axios from 'axios';
 @Injectable()
 export class SpawnThreadService {
   stopProcess: boolean;
@@ -7,64 +8,50 @@ export class SpawnThreadService {
     this.stopProcess = false;
   }
 
-  splitArrayByLimitAndSkip(array, limit:number, skip:number) {
-    if (!Array.isArray(array) || array.length === 0) {
-      return [];
+  limitAndSkip(data:Array<any>, limit:number, skip:number) {
+    if (!Array.isArray(data)) {
+      throw new Error('Input data must be an array.');
     }
 
-    if (
-      typeof limit !== 'number' ||
-      limit <= 0 ||
-      typeof skip !== 'number' ||
-      skip < 0
-    ) {
-      throw new Error('Invalid limit or skip values');
+    if (typeof limit !== 'number' || typeof skip !== 'number') {
+      throw new Error('Limit and skip must be numbers.');
     }
 
-    const result = [];
-    let startIndex = 0;
-
-    while (startIndex < array.length) {
-      const chunk = array.slice(startIndex, startIndex + limit);
-      result.push(chunk[0]);
-      startIndex += limit + skip;
+    if (limit < 0) {
+      throw new Error('Limit cannot be negative.');
     }
 
-    return result;
+    if (skip < 0) {
+      throw new Error('Skip cannot be negative.');
+    }
+
+    return data.slice(skip, skip + limit);
   }
 
   runService = async (MainThreadData: any) => {
-    console.log("--");
-    
     return new Promise(async (resolve, reject) => {
-      this.stopProcess = true;
+      this.stopProcess = false;
 
       const batchSize = 1; // Adjust batch size as needed
       let offset = 0;
 
-      while (true) {        
-        if (!this.stopProcess) {
+      while (true) {
+        if (this.stopProcess) {
           resolve({ message: 'Email Stopped Successfully', status: true });
           break;
         }
-        let emails = this.splitArrayByLimitAndSkip(
-          MainThreadData.users,
-          batchSize,
-          offset,
-        );
+        let emails = this.limitAndSkip(MainThreadData.users, batchSize, offset);
 
-        console.log(MainThreadData);
-
-        if (emails.length === 0) {          
+        if (emails.length === 0) {
           resolve({ message: 'Email Sent Successfully', status: false });
           break; // No more unsent emails
         }
-
-        console.log("emaisl ===========0",emails);
-        
         // Send emails in the current batch
         try {
-          let sendMail = await this.sparkClient.sendBulkmail({jobDetails:MainThreadData.jobDetails,users:emails});
+          let sendMail = await this.sparkClient.sendBulkmail({
+            jobDetails: MainThreadData.jobDetails,
+            users: emails,
+          });
           console.log(sendMail);
         } catch (error) {
           reject(error);
