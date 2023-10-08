@@ -276,8 +276,8 @@ export class UsersService {
     );
   }
 
-  stopLoop() {
-    this.worker.postMessage(true);
+  stopMailProcess() {
+    this.worker.postMessage("true");
     return { message: 'Loop Stopped' };
   }
 }

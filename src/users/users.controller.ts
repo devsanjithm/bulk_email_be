@@ -92,4 +92,39 @@ export class UsersController {
         );
     }
   }
+
+  @Get('stop-mail')
+  async StopMail(@Body() body: any, @Res() res: Response) {
+    try {
+      const user = await this.usersService.stopMailProcess();
+      return res
+        .status(STATUS_CODE.success)
+        .json(
+          await response(
+            ' Mail Process Treiminated!',
+            { user },
+            STATUS_CODE.success,
+            true,
+            '',
+          ),
+        );
+    } catch (error) {
+      Logger.error(error);
+      return res
+        .status(
+          _.has(error, 'code') ? error?.code : STATUS_CODE.internalServerError,
+        )
+        .json(
+          await response(
+            'Mail Termination Failed',
+            {},
+            _.has(error, 'code')
+              ? error?.code
+              : STATUS_CODE.internalServerError,
+            false,
+            error.message,
+          ),
+        );
+    }
+  }
 }
