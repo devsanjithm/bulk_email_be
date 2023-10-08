@@ -31,7 +31,7 @@ export class SparkService {
   }
 
   sendBulkmail(data: any) {
-    console.log(data);
+    console.log(data,'sparkservice34');
     return new Promise(async (resolve, reject) => {
       try {
         const messageData = await axios.get(
@@ -55,7 +55,11 @@ export class SparkService {
             inline_css: true,
           },
           content: {
+<<<<<<< Updated upstream
             from: "support@dynamicsdigital.info",
+=======
+            from:"support@dynamicsdigital.info",
+>>>>>>> Stashed changes
             subject: data.jobDetails.email_subject,
             html: data.jobDetails.mail_content,
             // headers: {
@@ -70,7 +74,6 @@ export class SparkService {
         return resolve(response);
       } catch (error) {
         console.log(error);
-
         return reject(error);
       }
     });

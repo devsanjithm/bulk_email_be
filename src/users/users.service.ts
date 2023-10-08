@@ -181,6 +181,7 @@ export class UsersService {
             workerData: MailData,
           });
 
+
           this.worker.once('message', (result) => {
             console.log(`$Email Sent Successfully : ${JSON.stringify(result)}`);
           });
@@ -198,10 +199,12 @@ export class UsersService {
         }
 
         // let sendMail = await this.sparkClient.sendBulkmail(MailData);
+        // console.log(sendMail);
+        
         return resolve({
           statusCode: STATUS_CODE.success,
           message: 'Mail Sent Successfully',
-          data: 'sendMail',
+          data: "sendMail",
         });
       } catch (error) {
         return reject(error);
@@ -277,7 +280,11 @@ export class UsersService {
   }
 
   stopMailProcess() {
+<<<<<<< Updated upstream
     this.worker.postMessage("true");
+=======
+    this.worker.postMessage(true);
+>>>>>>> Stashed changes
     return { message: 'Loop Stopped' };
   }
 }
