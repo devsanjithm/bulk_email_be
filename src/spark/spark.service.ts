@@ -60,7 +60,7 @@ export class SparkService {
             html: data.jobDetails.mail_content,
             // headers: {
             //   'Content-Type':data.jobDetails.header_type,
-            //   // 'X-Custom-Header': data.jobDetails.header_content,
+            //   'X-Custom-Header': data.jobDetails.header_content,
             //  'X-Encrypted-HTML':encryptedMailContent
             // },
           },
