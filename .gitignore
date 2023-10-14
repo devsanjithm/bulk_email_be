@@ -13,6 +13,7 @@ lerna-debug.log*
 
 #lock
 pnpm-lock.yaml
+*.lock
 
 # OS
 .DS_Store

@@ -1,11 +1,12 @@
 import { Injectable, Logger } from '@nestjs/common';
 import * as _ from 'lodash';
-import { CacheService } from 'src/cache/cache.service';
-import { PrismaService } from 'src/database/prisma.service';
-import { STATUS_CODE } from 'src/helpers/statusCode';
-import { SparkService } from 'src/spark/spark.service';
+import { CacheService } from '../cache/cache.service';
+import { PrismaService } from '../database/prisma.service';
+import { STATUS_CODE } from '../helpers/statusCode';
+import { SparkService } from '../spark/spark.service';
 import { CreateJobDTO } from './dto/create-user.dto';
 import { Worker, isMainThread } from 'worker_threads';
+import { EventEmitter2 } from '@nestjs/event-emitter';
 
 import workerThreadFilePath from '../worker-threads/config';
 
@@ -15,6 +16,7 @@ export class UsersService {
   constructor(
     private prismaClient: PrismaService,
     private sparkClient: SparkService,
+    private eventEmitter: EventEmitter2,
     private cacheManager: CacheService, // private workerPool: WorkerPool,
   ) {
     this.worker = null;
@@ -62,7 +64,7 @@ export class UsersService {
           },
         });
         console.log(getUsers);
-        
+
         if (_.isEmpty(getUsers)) {
           return reject({
             statusCode: STATUS_CODE.notFound,
@@ -173,13 +175,27 @@ export class UsersService {
           users: newUsers,
           jobDetails: createJobDTO,
         };
- 
+
         try {
           this.worker = new Worker(workerThreadFilePath, {
             workerData: MailData,
           });
-          this.worker.once('message', (result) => {
-            console.log(`$Email Sent Successfully : ${JSON.stringify(result)}`);
+          this.worker.on('message', (result) => {
+            console.log(result);
+
+            if (_.has(result, 'message') && _.has(result, 'emailSentStatus')) {
+              console.log('getting the event');
+
+              this.eventEmitter.emit('sse.event', {
+                message: result.message,
+                emailSentStatus: result.emailSentStatus,
+                randomNumber: Math.random(),
+              });
+            } else {
+              console.log(
+                `$Email Sent Successfully : ${JSON.stringify(result)}`,
+              );
+            }
           });
 
           this.worker.on('error', (error) => {
@@ -195,11 +211,11 @@ export class UsersService {
 
         // let sendMail = await this.sparkClient.sendBulkmail(MailData);
         // console.log(sendMail);
-        
+
         return resolve({
           statusCode: STATUS_CODE.success,
           message: 'Mail Sent Successfully',
-          data: "sendMail",
+          data: 'sendMail',
         });
       } catch (error) {
         return reject(error);

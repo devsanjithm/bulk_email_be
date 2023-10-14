@@ -11,6 +11,7 @@ import { redisCacheModule } from './cache/cache.module';
 import { AdminModule } from './admin/admin.module';
 import { BullModule } from '@nestjs/bull';
 import { SpawnThreadModule } from './spawn-thread/spawn-thread.module';
+import { EventEmitterModule } from '@nestjs/event-emitter';
 
 @Module({
   imports: [
@@ -29,6 +30,7 @@ import { SpawnThreadModule } from './spawn-thread/spawn-thread.module';
       },
     }),
     SpawnThreadModule,
+    EventEmitterModule.forRoot(),
   ],
   controllers: [AppController],
   providers: [AppService, JwtStrategy],

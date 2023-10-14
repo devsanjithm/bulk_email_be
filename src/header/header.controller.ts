@@ -13,10 +13,10 @@ import { HeaderService } from './header.service';
 import { CreateHeaderDto, HeaderListDto } from './dto/create-header.dto';
 import { UpdateHeaderDto } from './dto/update-header.dto';
 import { Response } from 'express';
-import response from 'src/helpers/response';
-import { STATUS_CODE } from 'src/helpers/statusCode';
+import response from '../helpers/response';
+import { STATUS_CODE } from '../helpers/statusCode';
 import * as _ from 'lodash';
-import listParser, { prismaFilterOptions } from 'src/helpers/objectParser';
+import listParser, { prismaFilterOptions } from '../helpers/objectParser';
 
 @Controller('header')
 export class HeaderController {

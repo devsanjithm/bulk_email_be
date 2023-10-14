@@ -1,5 +1,5 @@
 import { IsJSON, IsNotEmpty, IsString } from "class-validator";
-import { ListDto } from "src/helpers/objectParser";
+import { ListDto } from "../../helpers/objectParser";
 
 export class CreateHeaderDto {
 
