@@ -12,7 +12,6 @@ export class AdminService {
   ) {}
   login(payload: any) {
     return new Promise(async (resolve, reject) => {
-      debugger
       try {
         let prevUser = await this.prismaClient.admin.findFirst({
           where: {

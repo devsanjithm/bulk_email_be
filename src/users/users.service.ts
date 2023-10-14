@@ -173,15 +173,11 @@ export class UsersService {
           users: newUsers,
           jobDetails: createJobDTO,
         };
-
-        console.log('Mail Data  ===  ', MailData);        
-
+ 
         try {
           this.worker = new Worker(workerThreadFilePath, {
             workerData: MailData,
           });
-
-
           this.worker.once('message', (result) => {
             console.log(`$Email Sent Successfully : ${JSON.stringify(result)}`);
           });
@@ -189,7 +185,6 @@ export class UsersService {
           this.worker.on('error', (error) => {
             console.log(error);
           });
-
           this.worker.on('exit', (exitCode) => {
             console.log(`It exited with code ${exitCode}`);
           });
@@ -280,11 +275,7 @@ export class UsersService {
   }
 
   stopMailProcess() {
-<<<<<<< Updated upstream
-    this.worker.postMessage("true");
-=======
     this.worker.postMessage(true);
->>>>>>> Stashed changes
     return { message: 'Loop Stopped' };
   }
 }
