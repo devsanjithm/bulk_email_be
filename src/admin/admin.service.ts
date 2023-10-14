@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import * as _ from 'lodash';
-import { STATUS_CODE } from 'src/helpers/statusCode';
-import { PrismaService } from 'src/database/prisma.service';
+import { STATUS_CODE } from '../helpers/statusCode';
+import { PrismaService } from '../database/prisma.service';
 import * as bcrypt from 'bcrypt';
 import { JwtService } from '@nestjs/jwt';
 @Injectable()

@@ -12,18 +12,25 @@ async function run() {
   const MailData = workerData;
 
   userService.checkMainThread();
-  console.log("going to run service...");
+  console.log('going to run service...');
 
   parentPort.on('message', (message) => {
     console.log('Worker received a message from the main thread:', message);
-    if (message==="true") {
+    if (message) {
       spawnThreadService.stopMailService();
     }
   });
-  
-  const fibonacciSum = await spawnThreadService.runService(MailData);  
 
-  parentPort.postMessage(fibonacciSum);
+  spawnThreadService
+    .runService(MailData)
+    .then((data) => {
+      parentPort.postMessage(data);
+      parentPort.close
+    })
+    .catch((error) => {
+      console.error(error);
+      parentPort.close();
+    });
 }
 
 run();

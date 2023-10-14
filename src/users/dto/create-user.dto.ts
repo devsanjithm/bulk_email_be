@@ -6,7 +6,7 @@ import {
   IsString,
   ValidateNested,
 } from 'class-validator';
-import { GetDto } from 'src/helpers/objectParser';
+import { GetDto } from '../../helpers/objectParser';
 export class CreateUserDto {
   @IsString()
   @IsNotEmpty()

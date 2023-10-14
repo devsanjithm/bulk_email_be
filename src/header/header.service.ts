@@ -1,7 +1,7 @@
 import { Injectable, Logger } from '@nestjs/common';
-import { PrismaService } from 'src/database/prisma.service';
-import { prismaFilterOptions } from 'src/helpers/objectParser';
-import { STATUS_CODE } from 'src/helpers/statusCode';
+import { PrismaService } from '../database/prisma.service';
+import { prismaFilterOptions } from '../helpers/objectParser';
+import { STATUS_CODE } from '../helpers/statusCode';
 import { CreateHeaderDto } from './dto/create-header.dto';
 import { UpdateHeaderDto } from './dto/update-header.dto';
 

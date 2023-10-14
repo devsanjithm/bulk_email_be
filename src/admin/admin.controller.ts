@@ -6,8 +6,8 @@ import {
   Res,
 } from '@nestjs/common';
 import { AdminService } from './admin.service';
-import response from 'src/helpers/response';
-import { STATUS_CODE } from 'src/helpers/statusCode';
+import response from '../helpers/response';
+import { STATUS_CODE } from '../helpers/statusCode';
 import { Response } from 'express';
 import * as _ from 'lodash';
 

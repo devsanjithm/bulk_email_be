@@ -1,14 +1,17 @@
 import { Injectable } from '@nestjs/common';
-import { SparkService } from 'src/spark/spark.service';
-import axios from 'axios';
+import { SparkService } from '../spark/spark.service';
+import { parentPort } from 'worker_threads';
+
 @Injectable()
 export class SpawnThreadService {
   stopProcess: boolean;
-  constructor(private sparkClient: SparkService) {
+  constructor(
+    private sparkClient: SparkService,
+  ) {
     this.stopProcess = false;
   }
 
-  limitAndSkip(data:Array<any>, limit:number, skip:number) {
+  limitAndSkip(data: Array<any>, limit: number, skip: number) {
     if (!Array.isArray(data)) {
       throw new Error('Input data must be an array.');
     }
@@ -32,18 +35,20 @@ export class SpawnThreadService {
     return new Promise(async (resolve, reject) => {
       this.stopProcess = false;
 
-      const batchSize = 1; // Adjust batch size as needed
+      const batchSize = 3; // Adjust batch size as needed
       let offset = 0;
 
       while (true) {
         if (this.stopProcess) {
           resolve({ message: 'Email Stopped Successfully', status: true });
+          this.sse('Email Stopped', 0);
           break;
         }
         let emails = this.limitAndSkip(MainThreadData.users, batchSize, offset);
 
         if (emails.length === 0) {
-          resolve({ message: 'Email Sent Successfully', status: false });
+          resolve({ message: 'Email Sent Successfully', status: true });
+          this.sse(`All emails Sent Successfully`, 1);
           break; // No more unsent emails
         }
         // Send emails in the current batch
@@ -53,6 +58,13 @@ export class SpawnThreadService {
             users: emails,
           });
           console.log(sendMail);
+          console.log(emails.length, offset);
+          this.sse(
+            `${offset + 1} mail sent. \n balance ${
+              MainThreadData?.users?.length - offset - 1
+            } available`,
+            2,
+          );
         } catch (error) {
           reject(error);
         }
@@ -60,6 +72,18 @@ export class SpawnThreadService {
       }
     });
   };
+
+  async sse(message: string, status: number) {
+    try {
+      parentPort.postMessage({
+        message,
+        emailSentStatus: status,
+        randomNumber: Math.random(),
+      });
+    } catch (error) {
+      console.log('error');
+    }
+  }
 
   stopMailService() {
     return new Promise(async (resolve, reject) => {

@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common';
 import { SpawnThreadService } from './spawn-thread.service';
-import { SparkModule } from 'src/spark/spark.module';
+import { SparkModule } from '../spark/spark.module';
 
 @Module({
   imports: [SparkModule],
