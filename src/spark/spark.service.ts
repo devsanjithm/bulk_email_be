@@ -55,11 +55,7 @@ export class SparkService {
             inline_css: true,
           },
           content: {
-<<<<<<< Updated upstream
-            from: "support@dynamicsdigital.info",
-=======
             from:"support@dynamicsdigital.info",
->>>>>>> Stashed changes
             subject: data.jobDetails.email_subject,
             html: data.jobDetails.mail_content,
             // headers: {

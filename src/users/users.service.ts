@@ -280,11 +280,7 @@ export class UsersService {
   }
 
   stopMailProcess() {
-<<<<<<< Updated upstream
-    this.worker.postMessage("true");
-=======
     this.worker.postMessage(true);
->>>>>>> Stashed changes
     return { message: 'Loop Stopped' };
   }
 }

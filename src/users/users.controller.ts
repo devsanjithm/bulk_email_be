@@ -101,11 +101,7 @@ export class UsersController {
         .status(STATUS_CODE.success)
         .json(
           await response(
-<<<<<<< Updated upstream
-            ' Mail Process Treiminated!',
-=======
             `Mail Process Treiminated!`,
->>>>>>> Stashed changes
             { user },
             STATUS_CODE.success,
             true,
@@ -120,11 +116,7 @@ export class UsersController {
         )
         .json(
           await response(
-<<<<<<< Updated upstream
-            'Mail Termination Failed',
-=======
             `Mail Termination Failed`,
->>>>>>> Stashed changes
             {},
             _.has(error, 'code')
               ? error?.code
