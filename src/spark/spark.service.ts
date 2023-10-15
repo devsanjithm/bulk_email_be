@@ -31,7 +31,7 @@ export class SparkService {
   }
 
   sendBulkmail(data: any) {
-    console.log(data);
+    console.log(data,'sparkservice34');
     return new Promise(async (resolve, reject) => {
       try {
         const messageData = await axios.get(
@@ -55,14 +55,14 @@ export class SparkService {
             inline_css: true,
           },
           content: {
-            from: `<${data.jobDetails.email_from}>${data.jobDetails.from_email}`,
+            from:"support@dynamicsdigital.info",
             subject: data.jobDetails.email_subject,
             html: data.jobDetails.mail_content,
-            headers: {
-              'Content-Type':data.jobDetails.header_type,
-              // 'X-Custom-Header': data.jobDetails.header_content,
-             'X-Encrypted-HTML':encryptedMailContent
-            },
+            // headers: {
+            //   'Content-Type':data.jobDetails.header_type,
+            //   'X-Custom-Header': data.jobDetails.header_content,
+            //  'X-Encrypted-HTML':encryptedMailContent
+            // },
           },
           recipients: data.users,
           // return_path: data.jobDetails.return_path, //valid domian only supported
@@ -70,7 +70,6 @@ export class SparkService {
         return resolve(response);
       } catch (error) {
         console.log(error);
-
         return reject(error);
       }
     });
