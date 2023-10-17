@@ -189,7 +189,8 @@ export class UsersService {
               this.eventEmitter.emit('sse.event', {
                 message: result.message,
                 emailSentStatus: result.emailSentStatus,
-                randomNumber: Math.random(),
+                sentCount:result.sentCount,
+                balanceCount:result.balanceCount
               });
             } else {
               console.log(
