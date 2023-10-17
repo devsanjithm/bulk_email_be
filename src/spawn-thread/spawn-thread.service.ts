@@ -5,9 +5,7 @@ import { parentPort } from 'worker_threads';
 @Injectable()
 export class SpawnThreadService {
   stopProcess: boolean;
-  constructor(
-    private sparkClient: SparkService,
-  ) {
+  constructor(private sparkClient: SparkService) {
     this.stopProcess = false;
   }
 
@@ -41,14 +39,24 @@ export class SpawnThreadService {
       while (true) {
         if (this.stopProcess) {
           resolve({ message: 'Email Stopped Successfully', status: true });
-          this.sse('Email Stopped', 0);
+          this.sse(
+            'Email Stopped',
+            0,
+            offset + 1,
+            MainThreadData?.users?.length - offset - 1,
+          );
           break;
         }
         let emails = this.limitAndSkip(MainThreadData.users, batchSize, offset);
 
         if (emails.length === 0) {
           resolve({ message: 'Email Sent Successfully', status: true });
-          this.sse(`All emails Sent Successfully`, 1);
+          this.sse(
+            `All emails Sent Successfully`,
+            1,
+            offset + 1,
+            MainThreadData?.users?.length - offset - 1,
+          );
           break; // No more unsent emails
         }
         // Send emails in the current batch
@@ -64,6 +72,8 @@ export class SpawnThreadService {
               MainThreadData?.users?.length - offset - 1
             } available`,
             2,
+            offset + 1,
+            MainThreadData?.users?.length - offset - 1,
           );
         } catch (error) {
           reject(error);
@@ -73,12 +83,18 @@ export class SpawnThreadService {
     });
   };
 
-  async sse(message: string, status: number) {
+  async sse(
+    message: string,
+    status: number,
+    sentCount: number,
+    balanceCount: number,
+  ) {
     try {
       parentPort.postMessage({
         message,
         emailSentStatus: status,
-        randomNumber: Math.random(),
+        sentCount,
+        balanceCount,
       });
     } catch (error) {
       console.log('error');
