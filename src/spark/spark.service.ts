@@ -34,40 +34,43 @@ export class SparkService {
     console.log(data,'sparkservice34');
     return new Promise(async (resolve, reject) => {
       try {
-        const messageData = await axios.get(
-          'https://api.sparkpost.com/api/v1/metrics/deliverability/domain?from=2023-07-04T08:00&metrics=count_targeted,count_sent',
-          {
-            headers: {
-              Authorization: process.env.SPARKPOST_API_KEY,
-            },
-          },
-        );
-        console.log(messageData.data);
-        let encryptedMailContent = this.contentEncryption(
-          data.jobDetails.mail_content,
-          data.jobDetails.creative_type,
-        );
-        console.log(encryptedMailContent);
-        const response = await client.transmissions.send({
-          options: {
-            click_tracking: true,
-            open_tracking: true,
-            inline_css: true,
-          },
-          content: {
-            from:"support@dynamicsdigital.info",
-            subject: data.jobDetails.email_subject,
-            html: data.jobDetails.mail_content,
-            // headers: {
-            //   'Content-Type':data.jobDetails.header_type,
-            //   'X-Custom-Header': data.jobDetails.header_content,
-            //  'X-Encrypted-HTML':encryptedMailContent
-            // },
-          },
-          recipients: data.users,
-          // return_path: data.jobDetails.return_path, //valid domian only supported
-        });
-        return resolve(response);
+        // const messageData = await axios.get(
+        //   'https://api.sparkpost.com/api/v1/metrics/deliverability/domain?from=2023-07-04T08:00&metrics=count_targeted,count_sent',
+        //   {
+        //     headers: {
+        //       Authorization: process.env.SPARKPOST_API_KEY,
+        //     },
+        //   },
+        // );
+        // console.log(messageData.data);
+        // let encryptedMailContent = this.contentEncryption(
+        //   data.jobDetails.mail_content,
+        //   data.jobDetails.creative_type,
+        // );
+        // console.log(encryptedMailContent);
+        // const response = await client.transmissions.send({
+        //   options: {
+        //     click_tracking: true,
+        //     open_tracking: true,
+        //     inline_css: true,
+        //   },
+        //   content: {
+        //     from:"support@dynamicsdigital.info",
+        //     subject: data.jobDetails.email_subject,
+        //     html: data.jobDetails.mail_content,
+        //     // headers: {
+        //     //   'Content-Type':data.jobDetails.header_type,
+        //     //   'X-Custom-Header': data.jobDetails.header_content,
+        //     //  'X-Encrypted-HTML':encryptedMailContent
+        //     // },
+        //   },
+        //   recipients: data.users,
+        //   // return_path: data.jobDetails.return_path, //valid domian only supported
+        // });
+        // return resolve(response);
+        setTimeout(() => {
+          return resolve(true)
+        }, 3000);
       } catch (error) {
         console.log(error);
         return reject(error);
