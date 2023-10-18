@@ -5,6 +5,13 @@ import { AppService } from './app.service';
 import { JwtStrategy } from './helpers/jwt/jwt.stratergy';
 import { AppLoggerMiddleware } from './helpers/responseTime';
 import { UsersModule } from './users/users.module';
+import { SparkModule } from './spark/spark.module';
+import { HeaderModule } from './header/header.module';
+import { redisCacheModule } from './cache/cache.module';
+import { AdminModule } from './admin/admin.module';
+import { BullModule } from '@nestjs/bull';
+import { SpawnThreadModule } from './spawn-thread/spawn-thread.module';
+import { EventEmitterModule } from '@nestjs/event-emitter';
 
 @Module({
   imports: [
@@ -12,6 +19,18 @@ import { UsersModule } from './users/users.module';
     JwtModule.register({
       global: true,
     }),
+    SparkModule,
+    HeaderModule,
+    redisCacheModule,
+    AdminModule,
+    BullModule.forRoot({
+      redis: {
+        host: 'localhost',
+        port: 6379,
+      },
+    }),
+    SpawnThreadModule,
+    EventEmitterModule.forRoot(),
   ],
   controllers: [AppController],
   providers: [AppService, JwtStrategy],

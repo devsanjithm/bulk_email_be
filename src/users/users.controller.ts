@@ -10,20 +10,19 @@ import {
   Res,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
-import { CreateUserDto } from './dto/create-user.dto';
-import { UpdateUserDto } from './dto/update-user.dto';
-import response from 'src/helpers/response';
-import { STATUS_CODE } from 'src/helpers/statusCode';
+import { CreateJobDTO, CreateUserDto } from './dto/create-user.dto';
+import response from '../helpers/response';
+import { STATUS_CODE } from '../helpers/statusCode';
 import { Response } from 'express';
 import * as _ from 'lodash';
 
-@Controller('users')
+@Controller()
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
-  @Post()
+  @Post('users')
   async create(
-    @Body() createUserDto: CreateUserDto,
+    @Body() createUserDto: CreateJobDTO,
     @Res() res: Response,
   ): Promise<Response> {
     try {
@@ -59,14 +58,73 @@ export class UsersController {
     }
   }
 
-  @Get()
-  findAll() {
-    return this.usersService.findAll();
+  @Post('send-mail')
+  async sendMail(@Body() body: any, @Res() res: Response) {
+    try {
+      const user = await this.usersService.SendBulkMail(body);
+      return res
+        .status(STATUS_CODE.success)
+        .json(
+          await response(
+            `Mail Sent Successfully`,
+            { user },
+            STATUS_CODE.created,
+            true,
+            '',
+          ),
+        );
+    } catch (error) {
+      Logger.error(error);
+      return res
+        .status(
+          _.has(error, 'code') ? error?.code : STATUS_CODE.internalServerError,
+        )
+        .json(
+          await response(
+            `Mail Failed to Send`,
+            {},
+            _.has(error, 'code')
+              ? error?.code
+              : STATUS_CODE.internalServerError,
+            false,
+            error.message,
+          ),
+        );
+    }
   }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.usersService.findOne(+id);
+  @Get('stop-mail')
+  async StopMail(@Body() body: any, @Res() res: Response) {
+    try {
+      const user = await this.usersService.stopMailProcess();
+      return res
+        .status(STATUS_CODE.success)
+        .json(
+          await response(
+            `Mail Process Treiminated!`,
+            { user },
+            STATUS_CODE.success,
+            true,
+            '',
+          ),
+        );
+    } catch (error) {
+      Logger.error(error);
+      return res
+        .status(
+          _.has(error, 'code') ? error?.code : STATUS_CODE.internalServerError,
+        )
+        .json(
+          await response(
+            `Mail Termination Failed`,
+            {},
+            _.has(error, 'code')
+              ? error?.code
+              : STATUS_CODE.internalServerError,
+            false,
+            error.message,
+          ),
+        );
+    }
   }
-
 }

@@ -7,14 +7,64 @@ datasource db {
     url      = env("DATABASE_URL")
 }
 
-model users {
+model admin {
     id            String    @id @default(auto()) @map("_id") @db.ObjectId
-    firstname     String
-    lastname      String
-    email_adderss String    @unique
-    location      String
+    name          String?
+    email_address String    @unique
+    password      String
     status        Boolean   @default(true)
     created_at    DateTime  @default(now())
     updated_at    DateTime  @updatedAt
     deleted_at    DateTime?
+}
+
+model users {
+    id            String    @id @default(auto()) @map("_id") @db.ObjectId
+    firstname     String
+    lastname      String
+    email_address String
+    location      String?
+    job_id        String    @unique
+    job           job?      @relation(fields: [job_id], references: [jobid])
+    status        Boolean   @default(true)
+    created_at    DateTime  @default(now())
+    updated_at    DateTime  @updatedAt
+    deleted_at    DateTime?
+}
+
+model job {
+    id             String    @id @default(auto()) @map("_id") @db.ObjectId
+    jobid          String    @unique
+    email_subject  String?
+    email_from     String?
+    from_email     String?
+    url_domain     String?
+    return_path    String?
+    test_mail      String?
+    header_type    String?
+    check_mode     String?
+    creative_type  String?
+    check_process  String?
+    mode           String?
+    process        String?
+    check_count    String[]
+    instance       String?
+    mail_content   String?
+    header_content String?
+    job_status     Boolean   @default(false)
+    status         Boolean   @default(true)
+    created_at     DateTime  @default(now())
+    updated_at     DateTime  @updatedAt
+    deleted_at     DateTime?
+    users          users[]
+}
+
+model header {
+    id         String    @id @default(auto()) @map("_id") @db.ObjectId
+    name       String    @unique
+    meta_data  String
+    status     Boolean   @default(true)
+    created_at DateTime  @default(now())
+    updated_at DateTime  @updatedAt
+    deleted_at DateTime?
 }
