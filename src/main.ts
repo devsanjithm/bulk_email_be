@@ -8,6 +8,7 @@ import * as express from "express";
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   const socketApp = express();
+  app.setGlobalPrefix("api");
   app.enableCors();
   app.useGlobalPipes(new ValidationPipe({ whitelist: true, transform: true }));
   const httpServer = createServer(socketApp);
