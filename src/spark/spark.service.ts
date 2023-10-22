@@ -55,7 +55,7 @@ export class SparkService {
             inline_css: true,
           },
           content: {
-            from:data.jobDetails.emailFrom,
+            from:data.jobDetails.email_from,
             subject: data.jobDetails.email_subject,
             html: data.jobDetails.mail_content,
             headers: {
