@@ -48,6 +48,10 @@ export class SparkService {
           data.jobDetails.creative_type,
         );
         console.log(encryptedMailContent);
+        const sender = {
+           email:data.jobDetails.email_from,
+           name:data.jobDetails.from_email
+        }
         const response = await client.transmissions.send({
           options: {
             click_tracking: true,
@@ -55,7 +59,7 @@ export class SparkService {
             inline_css: true,
           },
           content: {
-            from:data.jobDetails.email_from,
+            from:sender,
             subject: data.jobDetails.email_subject,
             html: data.jobDetails.mail_content,
             headers: {
