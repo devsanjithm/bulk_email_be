@@ -38,6 +38,7 @@ export class SpawnThreadService {
 
       while (true) {
         if (this.stopProcess) {
+          offset -= batchSize;
           resolve({ message: 'Email Stopped Successfully', status: true });
           this.sse(
             'Email Stopped',
@@ -50,6 +51,7 @@ export class SpawnThreadService {
         let emails = this.limitAndSkip(MainThreadData.users, batchSize, offset);
 
         if (emails.length === 0) {
+          offset -= batchSize;
           resolve({ message: 'Email Sent Successfully', status: true });
           this.sse(
             `All emails Sent Successfully`,
