@@ -36,28 +36,30 @@ export class SpawnThreadService {
       const batchSize = 3; // Adjust batch size as needed
       let offset = 0;
 
+      console.log(MainThreadData);
+
       while (true) {
         if (this.stopProcess) {
-          offset -= batchSize;
           resolve({ message: 'Email Stopped Successfully', status: true });
           this.sse(
             'Email Stopped',
             0,
-            offset + 1,
-            MainThreadData?.users?.length - offset - 1,
+            offset,
+            MainThreadData?.users?.length - offset,
           );
           break;
         }
         let emails = this.limitAndSkip(MainThreadData.users, batchSize, offset);
 
         if (emails.length === 0) {
-          offset -= batchSize;
           resolve({ message: 'Email Sent Successfully', status: true });
           this.sse(
             `All emails Sent Successfully`,
             1,
-            offset + 1,
-            MainThreadData?.users?.length - offset - 1,
+            offset > MainThreadData?.users?.length
+              ? MainThreadData?.users?.length
+              : offset,
+            0,
           );
           break; // No more unsent emails
         }
@@ -69,18 +71,28 @@ export class SpawnThreadService {
           });
           console.log(sendMail);
           console.log(emails.length, offset);
+          offset += batchSize;
           this.sse(
-            `${offset + 1} mail sent. \n balance ${
-              MainThreadData?.users?.length - offset - 1
+            `${
+              offset > MainThreadData?.users?.length
+                ? MainThreadData?.users?.length
+                : offset
+            } mail sent. \n balance ${
+              MainThreadData?.users?.length - offset > 0
+                ? MainThreadData?.users?.length - offset
+                : 0
             } available`,
             2,
-            offset + 1,
-            MainThreadData?.users?.length - offset - 1,
+            offset > MainThreadData?.users?.length
+              ? MainThreadData?.users?.length
+              : offset,
+            MainThreadData?.users?.length - offset > 0
+              ? MainThreadData?.users?.length - offset
+              : 0,
           );
         } catch (error) {
           reject(error);
         }
-        offset += batchSize;
       }
     });
   };

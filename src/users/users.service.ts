@@ -54,6 +54,25 @@ export class UsersService {
     });
   }
 
+  makeCommaSeparatedintoSingle(mailData: string) {
+    if (!_.isEmpty(mailData)) {
+      return [];
+    }
+    let ArraymailData = mailData.split(',');
+    let newData = [];
+    if (ArraymailData.length > 1) {
+      for (let i = 0; i < ArraymailData.length; i++) {
+        const element = ArraymailData[i];
+        if (!_.isEmpty(element)) {
+          newData.push({ address: element });
+        }
+      }
+    } else {
+      newData.push({ address: mailData });
+    }
+    return newData;
+  }
+
   SendBulkMail(createJobDTO: CreateJobDTO) {
     return new Promise(async (resolve, reject) => {
       let { job_id } = createJobDTO;
@@ -101,10 +120,12 @@ export class UsersService {
             for (let i = 0; i <= secondJob.length; i++) {
               count++;
               if (count === parseInt(createJobDTO.check_count[0]) + 1) {
-                const newData = { address: createJobDTO.test_mail };
+                const newData = this.makeCommaSeparatedintoSingle(
+                  createJobDTO.test_mail,
+                );
                 let instance = parseInt(createJobDTO.instance);
                 for (let i = 0; i < instance; i++) {
-                  newUsers.push(newData);
+                  newUsers.push(...newData);
                 }
                 count = 1;
               }
@@ -127,10 +148,12 @@ export class UsersService {
             for (let i = 0; i <= firstJob.length; i++) {
               count++;
               if (count === parseInt(createJobDTO.check_count[0]) + 1) {
-                const newData = { address: createJobDTO.test_mail };
+                const newData = this.makeCommaSeparatedintoSingle(
+                  createJobDTO.test_mail,
+                );
                 let instance = parseInt(createJobDTO.instance);
                 for (let i = 0; i < instance; i++) {
-                  newUsers.push(newData);
+                  newUsers.push([...newData]);
                 }
                 count = 1;
               }
@@ -150,10 +173,12 @@ export class UsersService {
           for (let i = 0; i <= users.length; i++) {
             count++;
             if (count === parseInt(createJobDTO.check_count[0]) + 1) {
-              const newData = { address: createJobDTO.test_mail };
+              const newData = this.makeCommaSeparatedintoSingle(
+                createJobDTO.test_mail,
+              );
               let instance = parseInt(createJobDTO.instance);
               for (let i = 0; i < instance; i++) {
-                newUsers.push(newData);
+                newUsers.push(...newData);
               }
               count = 1;
             }
@@ -168,7 +193,10 @@ export class UsersService {
           createJobDTO.mode === 'check'
         ) {
           //only for test mail
-          newUsers.push({ address: createJobDTO.test_mail });
+          const newData = this.makeCommaSeparatedintoSingle(
+            createJobDTO.test_mail,
+          );
+          newUsers.push(...newData);
         }
 
         let MailData: any = {
@@ -189,8 +217,8 @@ export class UsersService {
               this.eventEmitter.emit('sse.event', {
                 message: result.message,
                 emailSentStatus: result.emailSentStatus,
-                sentCount:result.sentCount,
-                balanceCount:result.balanceCount
+                sentCount: result.sentCount,
+                balanceCount: result.balanceCount,
               });
             } else {
               console.log(
