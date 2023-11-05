@@ -55,9 +55,9 @@ export class UsersService {
   }
 
   makeCommaSeparatedintoSingle(mailData: string) {
-    if (!_.isEmpty(mailData)) {
-      return [];
-    }
+    // if (!_.isEmpty(mailData)) {
+    //   return [];
+    // }
     let ArraymailData = mailData.split(',');
     let newData = [];
     if (ArraymailData.length > 1) {
