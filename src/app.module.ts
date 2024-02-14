@@ -12,6 +12,8 @@ import { AdminModule } from './admin/admin.module';
 import { BullModule } from '@nestjs/bull';
 import { SpawnThreadModule } from './spawn-thread/spawn-thread.module';
 import { EventEmitterModule } from '@nestjs/event-emitter';
+import { NodeMailerPmtaService } from './node-mailer-pmta/node-mailer-pmta.service';
+import { NodeMailerPmtaModule } from './node-mailer-pmta/node-mailer-pmta.module';
 
 @Module({
   imports: [
@@ -31,9 +33,10 @@ import { EventEmitterModule } from '@nestjs/event-emitter';
     }),
     SpawnThreadModule,
     EventEmitterModule.forRoot(),
+    NodeMailerPmtaModule,
   ],
   controllers: [AppController],
-  providers: [AppService, JwtStrategy],
+  providers: [AppService, JwtStrategy, NodeMailerPmtaService],
 })
 export class AppModule implements NestModule {
   configure(consumer: MiddlewareConsumer): void {

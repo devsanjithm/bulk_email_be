@@ -82,8 +82,7 @@ export class UsersService {
             job_id,
           },
         });
-        console.log(getUsers);
-
+      
         if (_.isEmpty(getUsers)) {
           return reject({
             statusCode: STATUS_CODE.notFound,
@@ -209,7 +208,7 @@ export class UsersService {
             workerData: MailData,
           });
           this.worker.on('message', (result) => {
-            console.log(result);
+   
 
             if (_.has(result, 'message') && _.has(result, 'emailSentStatus')) {
               console.log('getting the event');
@@ -228,7 +227,7 @@ export class UsersService {
           });
 
           this.worker.on('error', (error) => {
-            console.log(error);
+            console.log(error,"worker========");
           });
           this.worker.on('exit', (exitCode) => {
             console.log(`It exited with code ${exitCode}`);
