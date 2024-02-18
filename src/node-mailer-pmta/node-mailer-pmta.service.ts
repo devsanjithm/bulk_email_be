@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 //import * as nodemailer from 'nodemailer-for-pmta';
 import axios from 'axios';
 import { SparkService } from 'src/spark/spark.service';
-const nodemailer = require("../../node_modulescla/nodemailer");
+const nodemailer = require("../../node_modules/nodemailer");
 console.log(nodemailer);
 
 @Injectable()
