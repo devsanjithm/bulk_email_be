@@ -1,7 +1,8 @@
 import { Injectable } from '@nestjs/common';
-import * as nodemailer from 'nodemailer-for-pmta';
+//import * as nodemailer from 'nodemailer-for-pmta';
 import axios from 'axios';
 import { SparkService } from 'src/spark/spark.service';
+const nodemailer = require("../../node_modulescla/nodemailer");
 console.log(nodemailer);
 
 @Injectable()
@@ -54,7 +55,7 @@ export class NodeMailerPmtaService {
 
         // Use nodemailer to send the email
         const response = await this.transporter.sendMail({
-          from: 'inform2619@gmail.com',
+          from: 'contact@mailiconic.com',
           subject: data.jobDetails.email_subject,
           html: data.jobDetails.mail_content,
           headers: {
