@@ -6,7 +6,12 @@ import { CreateJobDTO } from 'src/users/dto/create-user.dto';
 import * as CryptoJS from 'crypto-js';
 import * as quotedPrintable from 'quoted-printable';
 import * as base64 from 'base64-js';
-const client = new SparkPost(process.env.SPARKPOST_API_KEY);
+process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0"
+const sparkpostConfig = {
+  endpoint:'http://pmta.mailiconic.com:8080/'
+}
+
+const client = new SparkPost(process.env.SPARKPOST_API_KEY,sparkpostConfig);
 
 @Injectable()
 export class SparkService {
@@ -30,52 +35,53 @@ export class SparkService {
     return encodedValue;
   }
 
-  sendBulkmail(data: any) {
-    console.log(data,'sparkservice34');
-    return new Promise(async (resolve, reject) => {
-      try {
-        const messageData = await axios.get(
-          'https://api.sparkpost.com/api/v1/metrics/deliverability/domain?from=2023-07-04T08:00&metrics=count_targeted,count_sent',
-          {
-            headers: {
-              Authorization: process.env.SPARKPOST_API_KEY,
+    sendBulkmail(data: any) {
+      console.log(data,'sparkservice34');
+      return new Promise(async (resolve, reject) => {
+        try {
+          const messageData = await axios.get(
+            'https://api.sparkpost.com/api/v1/metrics/deliverability/domain?from=2023-07-04T08:00&metrics=count_targeted,count_sent',
+            {
+              headers: {
+                Authorization: process.env.SPARKPOST_API_KEY,
+              },
             },
-          },
-        );
-        console.log(messageData.data);
-        let encryptedMailContent = this.contentEncryption(
-          data.jobDetails.mail_content,
-          data.jobDetails.creative_type,
-        );
-        console.log(encryptedMailContent);
-        const sender = {
-           email:data.jobDetails.email_from,
-           name:data.jobDetails.from_email
+          );
+          console.log(messageData.data);
+          let encryptedMailContent = this.contentEncryption(
+            data.jobDetails.mail_content,
+            data.jobDetails.creative_type,
+          );
+          console.log(encryptedMailContent);
+          const sender = {
+            email:data.jobDetails.email_from,
+            name:data.jobDetails.from_email
+          }
+          const response = await client.transmissions.send({
+            options: {
+              click_tracking: true,
+              open_tracking: true,
+              inline_css: true,
+              
+            },
+            content: {
+              from:sender,
+              subject: data.jobDetails.email_subject,
+              html: data.jobDetails.mail_content,
+              headers: {
+                // 'Content-Type':data.jobDetails.header_type,
+                'X-Custom-Header':"data.jobDetails.header_content",
+              'X-Encrypted-HTML':encryptedMailContent
+              },
+            },
+            recipients: data.users,
+            return_path: data.jobDetails.return_path, //valid domian only supported
+          });
+          return resolve(response);
+        } catch (error) {
+          console.log(error);
+          return reject(error);
         }
-        const response = await client.transmissions.send({
-          options: {
-            click_tracking: true,
-            open_tracking: true,
-            inline_css: true,
-          },
-          content: {
-            from:sender,
-            subject: data.jobDetails.email_subject,
-            html: data.jobDetails.mail_content,
-            headers: {
-              // 'Content-Type':data.jobDetails.header_type,
-              'X-Custom-Header':"data.jobDetails.header_content",
-             'X-Encrypted-HTML':encryptedMailContent
-            },
-          },
-          recipients: data.users,
-          return_path: data.jobDetails.return_path, //valid domian only supported
-        });
-        return resolve(response);
-      } catch (error) {
-        console.log(error);
-        return reject(error);
-      }
-    });
-  }
+      });
+    }
 }
