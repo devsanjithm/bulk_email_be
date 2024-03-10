@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import * as nodemailer from 'nodemailer-for-pmta';
+import * as nodemailer from 'nodemailer';
 import axios from 'axios';
 import { SparkService } from 'src/spark/spark.service';
 console.log(nodemailer);
@@ -18,11 +18,9 @@ export class NodeMailerPmtaService {
         user: 'pmtasmtpuser', // Replace with your PowerMTA username
         pass: 'reset@678', // Replace with your PowerMTA password
       },
-
-      tls: {
-        // do not fail on invalid certs
-        rejectUnauthorized: false,
-      },
+      // tls: {
+      //   rejectUnauthorized: false,
+      // },
     });
   }
 
@@ -31,41 +29,29 @@ export class NodeMailerPmtaService {
     
     return new Promise(async (resolve, reject) => {
       try {
-        // const messageData = await axios.get(
-        //   'https://api.sparkpost.com/api/v1/metrics/deliverability/domain?from=2023-07-04T08:00&metrics=count_targeted,count_sent',
-        //   {
-        //     headers: {
-        //       Authorization: process.env.SPARKPOST_API_KEY,
-        //     },
-        //   },
-        // );
-        // console.log(messageData.data);
-
         let encryptedMailContent = this.sparkService.contentEncryption(
           data.jobDetails.mail_content,
           data.jobDetails.creative_type,
         );
 
         const sender = {
-          email: data.jobDetails.email_from,
-          name: data.jobDetails.from_email,
+          email:data.jobDetails.from_email ,
+          name:data.jobDetails.email_from ,
         };
         console.log('go to PMTA', data);
 
         // Use nodemailer to send the email
         const response = await this.transporter.sendMail({
-          from: 'inform2619@gmail.com',
+          from: `"${sender.name}" <${sender.email}>`,
           subject: data.jobDetails.email_subject,
           html: data.jobDetails.mail_content,
           headers: {
             'X-Custom-Header': data.jobDetails.header_content,
             'X-Encrypted-HTML': encryptedMailContent,
           },
-
           to: data.users,
         });
         console.log(response, 'response==');
-
         return resolve(response);
       } catch (error) {
         console.log(error, 'ERROr from Nodemailer');
