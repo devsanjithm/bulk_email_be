@@ -1,11 +1,11 @@
 import { Injectable } from '@nestjs/common';
 import { SparkService } from '../spark/spark.service';
 import { parentPort } from 'worker_threads';
-
+import { NodeMailerPmtaService } from 'src/node-mailer-pmta/node-mailer-pmta.service';
 @Injectable()
 export class SpawnThreadService {
   stopProcess: boolean;
-  constructor(private sparkClient: SparkService) {
+  constructor(private sparkClient: SparkService,private nodmailerPMTAClient:NodeMailerPmtaService ) {
     this.stopProcess = false;
   }
 
@@ -36,8 +36,6 @@ export class SpawnThreadService {
       const batchSize = 3; // Adjust batch size as needed
       let offset = 0;
 
-      console.log(MainThreadData);
-
       while (true) {
         if (this.stopProcess) {
           resolve({ message: 'Email Stopped Successfully', status: true });
@@ -65,12 +63,12 @@ export class SpawnThreadService {
         }
         // Send emails in the current batch
         try {
-          let sendMail = await this.sparkClient.sendBulkmail({
+          let sendMail = await this.nodmailerPMTAClient.sendBulkmail({
             jobDetails: MainThreadData.jobDetails,
             users: emails,
           });
-          console.log(sendMail);
-          console.log(emails.length, offset);
+          console.log(sendMail,"sendMail=================================");
+
           offset += batchSize;
           this.sse(
             `${

@@ -25,7 +25,7 @@ async function run() {
     .runService(MailData)
     .then((data) => {
       parentPort.postMessage(data);
-      parentPort.close
+      parentPort.close;
     })
     .catch((error) => {
       console.error(error);

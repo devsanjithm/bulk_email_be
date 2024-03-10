@@ -82,7 +82,6 @@ export class UsersService {
             job_id,
           },
         });
-        console.log(getUsers);
 
         if (_.isEmpty(getUsers)) {
           return reject({
@@ -209,8 +208,6 @@ export class UsersService {
             workerData: MailData,
           });
           this.worker.on('message', (result) => {
-            console.log(result);
-
             if (_.has(result, 'message') && _.has(result, 'emailSentStatus')) {
               console.log('getting the event');
 
@@ -228,7 +225,7 @@ export class UsersService {
           });
 
           this.worker.on('error', (error) => {
-            console.log(error);
+            console.log(error, 'worker========');
           });
           this.worker.on('exit', (exitCode) => {
             console.log(`It exited with code ${exitCode}`);
@@ -243,7 +240,7 @@ export class UsersService {
 
         return resolve({
           statusCode: STATUS_CODE.success,
-          message: 'Mail Sent Successfully',
+          message: 'Mail Started Sending...',
           data: 'sendMail',
         });
       } catch (error) {
@@ -293,7 +290,7 @@ export class UsersService {
   // stopEmail() {
   //   return new Promise(async (resolve, reject) => {
   //     // Set the stopSending flag to true
-  //     stopSending = true;
+  //     Sending = true;
   //     resolve({ message: 'Email sending stopped' });
 
   //     // Inside the sending loop
