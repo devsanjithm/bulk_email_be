@@ -8,6 +8,7 @@ import * as express from "express";
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   const socketApp = express();
+  process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0"
   app.setGlobalPrefix("api");
   app.enableCors();
   app.useGlobalPipes(new ValidationPipe({ whitelist: true, transform: true }));
