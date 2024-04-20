@@ -9,12 +9,12 @@ import {
 import { GetDto } from '../../helpers/objectParser';
 export class CreateUserDto {
   @IsString()
-  @IsNotEmpty()
-  public firstname: string;
+  @IsOptional()
+  public firstname?: string;
 
   @IsString()
-  @IsNotEmpty()
-  public lastname: string;
+  @IsOptional()
+  public lastname?: string;
 
   @IsEmail()
   @IsNotEmpty()

@@ -20,8 +20,8 @@ model admin {
 
 model users {
     id            String    @id @default(auto()) @map("_id") @db.ObjectId
-    firstname     String
-    lastname      String
+    firstname     String?
+    lastname      String?
     email_address String
     location      String?
     job_id        String    @unique
