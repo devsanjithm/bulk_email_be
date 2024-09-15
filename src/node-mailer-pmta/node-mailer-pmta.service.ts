@@ -11,7 +11,7 @@ export class NodeMailerPmtaService {
   constructor(private readonly sparkService: SparkService) {
     // Use nodemailer-for-pmta transport
     this.transporter = nodemailer.createTransport({
-      host: 'pmta.mailiconic.com', // Replace with your PowerMTA host
+      host: 'pmta.royalgadgethouse.online ', // Replace with your PowerMTA host
       port: 2525, // Adjust the port according to your PowerMTA configuration
       secure: false,
       auth: {
